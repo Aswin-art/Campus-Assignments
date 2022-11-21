@@ -25,13 +25,18 @@ print(result)
 
 # Soal Nomor 4 (Ada berapa permutasi dari kata MASSACHUSETTS?)
 from itertools import permutations
-words = 'MASSACHUSETTS'
 
-result = list(permutations(words))
+def factorial(number):
+    result = number
+    for i in range(1, number):
+        result *= i
+    return result
 
-length = len(result)
+words = ['M', 'A', 'S', 'S', 'A', 'C', 'H', 'U', 'S', 'E', 'T', 'T', 'S']
 
-print(length)
+result = int(factorial(len(words)) / factorial(2) * factorial(4) * factorial(2))
+
+print(result)
 
 # Soal Nomor 5 (Ada berapa cara untuk memilih 5 pemain dari 10 orang pemain tenis untuk mengikuti lomba?)
 from itertools import combinations
