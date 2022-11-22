@@ -34,7 +34,7 @@ def factorial(number):
 
 words = ['M', 'A', 'S', 'S', 'A', 'C', 'H', 'U', 'S', 'E', 'T', 'T', 'S']
 
-result = int(factorial(len(words)) / factorial(2) * factorial(4) * factorial(2))
+result = int(factorial(len(words)) / (factorial(2) * factorial(4) * factorial(2)))
 
 print(result)
 
@@ -73,7 +73,7 @@ from itertools import combinations
 
 items = ['A', 'B', 'C']
 
-result = list(combinations(items, 3))
+result = list(combinations(items, 2))
 length_result = len(result)
 
 print(f"Kombinasinya: {result}\nTotal Kombinasi: {length_result}")
