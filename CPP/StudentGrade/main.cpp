@@ -21,11 +21,10 @@ int main() {
     for(int i = 0; i < data; ++i){
         cout << "Data ke-" << i + 1 << endl;
         cout << "\t" << "Masukkan NIM: ";
-        // getline(cin, nim[i]);
         cin >> nim[i];
         cout << "\t" << "Masukkan Nama: ";
-        // getline(cin, nama[i]);
-        cin >> nama[i];
+        cin.ignore();
+        getline(cin, nama[i]);
         cout << "\t" << "Masukkan nilai UTS: ";
         cin >> uts[i];
         cout << "\t" << "Masukkan nilai UAS: ";
@@ -57,7 +56,7 @@ int main() {
     
     
     // Menampilkan hasil akhir
-    cout << "No.\tNIM\t\tNAMA\t\tRATA\tHURUF\tKETERANGAN" << endl;
+    cout << "No.\tNIM\t\tNAMA\t\t\tRATA\tHURUF\tKETERANGAN" << endl;
     for(int i = 0; i < data; ++i){
         char huruf;
         string keterangan;
@@ -78,7 +77,7 @@ int main() {
             keterangan = "TIDAK LULUS";
         }
         
-        cout << i + 1 << "\t" << nim[i] << "\t" << nama[i] << "\t\t" << grade_result[i] << "\t" << huruf << "\t" << keterangan << endl;
+        cout << i + 1 << "\t" << nim[i] << "\t" << nama[i] << "\t" << grade_result[i] << "\t" << huruf << "\t" << keterangan << endl;
     }
 
     return 0;
