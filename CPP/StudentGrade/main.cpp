@@ -54,6 +54,32 @@ int main() {
     
     cout << endl;
     
+    // Melakukan sorting data menggunakan Selection Sort
+    for(int i = 0; i < data - 1; i++){
+        int min = i;
+        for(int j = i + 1; j < data; j++){
+            if(grade_result[j] > grade_result[min]){
+                min = j;
+            }
+        }
+        if(min != i){
+            // Switch NIM
+            string temp_nim = nim[i];
+            nim[i] = nim[min];
+            nim[min] = temp_nim;
+            
+            // Switch Nama
+            string temp_nama = nama[i];
+            nama[i] = nama[min];
+            nama[min] = temp_nama;
+            
+            // Switch Rata / Grade Result
+            int temp_grade_result = grade_result[i];
+            grade_result[i] = grade_result[min];
+            grade_result[min] = temp_grade_result;
+        }
+    }
+    
     
     // Menampilkan hasil akhir
     cout << "No.\tNIM\t\tNAMA\t\t\tRATA\tHURUF\tKETERANGAN" << endl;
