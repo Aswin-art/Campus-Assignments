@@ -1,184 +1,229 @@
 #include <stdio.h>
+#include <windows.h>
 #include <conio.h>
+#include <time.h>
 
-char map[20][40];
-char player = '^', food = 'O';
-char tail[10] = {'*','*','*','*','*','*','*','*','*','*'};
-int y = 12;
-int x = 3;
-int a[10];
-int b[10];
-char walk;
+#define widht 40
+#define height 20
+
+// Game Variables
+int gameOver;
+int x, y, fruitX, fruitY, score;
+int tailX[100];
+int tailY[100];
+int nTail;
+enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
+enum eDirection dir;
 char playerName[100];
-int score = 0;
-int n = 0, gameover = 0, p = 10, q = 10, rand = 2, R = 1, i, j;
+int gameSpeed = 50;
 
-void generateMap(int p, int q, int R);
-void outputMap(int score);
-void moveUp();
-void moveDown();
-void moveLeft();
-void moveRight();
 
-int main(){
-	int i,j;
-	printf("===========================Selamat Datang Di Permainan===========================\n");
-	printf("1. Gunakan 'WASD' untuk menggerakkan ular\n");
-	printf("2. Makan buah '0' untuk menambah score & menambah panjang tubuh ular\n");
-	printf("3. Hindari tembok & jangan makan tubuh ular atau permainan akan berakhir\n");
-	printf("4. Dapatkan score sebanyak mungkin & enjoy the game!!\n");
-	printf("=================================================================================\n");
+// Timer variables
+int hour=0,minute=0,second=0,ms=0;
+
+int counter(){
+    if(minute > 59){
+        minute = 0;
+        ++hour;
+    }
+
+    if(second > 59){
+        second = 0;
+        ++minute;
+    }
+
+    if(ms >= 260){
+        second += 1;
+        ms = 0;
+    }
+}
+
+void setup() {
+    printf("===============================Selamat Datang Di Permainan===============================\n");
+    printf("=\t 1. Gunakan 'WASD' untuk menggerakkan ular\t\t\t\t\t=\n");
+	printf("=\t 2. Makan buah 'F' untuk menambah score & menambah panjang tubuh ular\t\t=\n");
+	printf("=\t 3. Hindari tembok & jangan makan tubuh ular atau permainan akan berakhir\t=\n");
+	printf("=\t 4. Untuk mengakhiri permainan tekan tombol 'x'\t\t\t\t\t=\n");
+	printf("=\t 5. Dapatkan score sebanyak mungkin & enjoy the game!!\t\t\t\t=\n");
+	printf("=========================================================================================\n");
 	printf("Masukkan nama anda: ");
 	gets(playerName);
-	system("color a");
-	do{
-		system("cls");
-		generateMap(p,q,R);
-		outputMap(score);
-		walk = getch();
-		for(i=9; i>0; i--){
-			a[i] = a[i-1];b[i] = b[i-1];
-		}
-		a[0] = y;b[0] = x;
-		switch(walk){
-			case 'w':
-				moveUp();
-				break;
-			case 's':
-				moveDown();
-				break;
-			case 'a':
-				moveLeft();
-				break;
-			case 'd':
-				moveRight();
-				break;
-		}
 
-		}while(gameover <= 0);
-	system("cls");
+    gameOver = 0;
+    dir = STOP;
+    x = widht / 2;
+    y = height / 2;
+    fruitX = rand() % widht - 2 + 4;
+    fruitY = rand() % height - 2 + 4;
+    score = 0;
+}
+
+void drawing() {
+    int i, j, k;
+    for (i = 0; i < widht + 2; i++) {
+        printf("#");
+    }
+    printf("\n");
+
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < widht; j++) {
+            if (j == 0) {
+                printf("#");
+            }
+            if (i == y && j == x) {
+                printf("O");
+            }
+            else if (i == fruitY && j == fruitX) {
+                printf("F");
+            }
+            else {
+                int print = 0;
+                for (int k = 0; k < nTail; k++) {
+                    if (tailX[k] == j && tailY[k] == i) {
+                        printf("o");
+                        print = 1;
+                    }
+                }
+                if (!print)
+                    printf(" ");
+            }
+
+            if (j == widht - 1) {
+                printf("#");
+            }
+        }
+        printf("\n");
+    }
+
+    for (i = 0; i < widht + 2; i++) {
+        printf("#");
+    }
+    printf("\n");
+    printf("NAMA = %s\n", playerName);
+    printf("SCORE = %d\n", score);
+    printf("WAKTU = %d:%d:%d\n",hour,minute,second);
+}
+
+void input() {
+    if (_kbhit()) {
+        switch (_getch()) {
+            case 'a':
+                dir = LEFT;
+                break;
+
+            case 'd':
+                dir = RIGHT;
+                break;
+
+            case 'w':
+                dir = UP;
+                break;
+
+            case 's':
+                dir = DOWN;
+                break;
+
+            case 'x':
+                gameOver = 1;
+                break;
+        }
+    }
+}
+
+void logic() {
+    int i;
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prevX2 = x;
+    int prevY2 = y;
+    tailX[0] = x;
+    tailY[0] = y;
+
+    for (i = 1; i < nTail; i++) {
+        prevX2 = tailX[i];
+        prevY2 = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prevX2;
+        prevY = prevY2;
+    }
+
+    switch (dir) {
+        case LEFT:
+            x--;
+            break;
+
+        case RIGHT:
+            x++;
+            break;
+
+        case UP:
+            y--;
+            break;
+
+        case DOWN:
+            y++;
+            break;
+
+        default:
+            break;
+    }
+
+    if (x >= widht) {
+//        x = 1;
+        gameOver = 1;
+    }
+    else if (x < 0) {
+//        x = widht - 1;
+        gameOver = 1;
+    }
+
+    if (y >= height) {
+//        y = 1;
+        gameOver = 1;
+    }
+    else if (y < 0) {
+//        y = height - 1;
+        gameOver = 1;
+    }
+
+    for (i = 0; i < nTail; i++) {
+        if (tailX[i] == x && tailY[i] == y) {
+            gameOver = 1;
+        }
+    }
+
+    if (x == fruitX && y == fruitY) {
+        score += 10;
+
+        fruitX = rand() % widht;
+        fruitY = rand() % height;
+        nTail++;
+    }
+}
+
+int main() {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+    setup();
+    while (!gameOver) {
+        system("cls");
+        Sleep(gameSpeed);
+        drawing();
+        input();
+        logic();
+        counter();
+        ms += gameSpeed;
+    }
+
+    system("cls");
 	printf("\t\t+==============================+\n");
 	printf("\t\t|      GAME BERAKHIR !!!      |\n");
 	printf("\t\t+==============================+\n");
-	printf("Score kamu: %d", score);
+	printf("NAMA : %s\n", playerName);
+	printf("SCORE AKHIR : %d\n", score);
+	printf("WAKTU = %d:%d:%d\n",hour,minute,second);
 	getch();
-	return 0;
-}
 
-void generateMap(int p, int q, int R){
-	int i,j;
-	for(i=0; i<20; i++){
-		for(j=0; j<40; j++){
-			map[i][j] = ' ';
-		}
-	}
-	map[0][0] = '+';
-	map[19][0] = '+';
-	map[19][39] = '+';
-	map[0][39] = '+';
-	for(i=1; i<19; i++){
-		map[i][0] = '|';
-		map[i][39]= '|';
-	}
-	for(j=1; j<39; j++){
-		map[0][j] = '=';
-		map[19][j] = '=';
-	}
-	map[y][x] = player;
-	for(i=0; i<R; i++){
-		map[a[i]][b[i]] = tail[i];
-	}
-	map[p][q] = food;
-}
-
-void outputMap(int score){
-	int i,j;
-	for(i=0; i<20; i++){
-		for(j=0; j<40; j++){
-			printf("%c",map[i][j]);
-		}
-		printf("\n");
-	}
-	printf("Nama: %s\n", playerName);
-	printf("Score: 00%d",score);
-}
-void moveUp(){
-	if(map[y - 1][x] == ' '){
-				y--;
-				map[y][x] = player;
-				}
-				else if(map[y - 1][x] == food){
-					p *= (rand + y * 3);q *= (rand + x * 9);
-					if(p >= 19) p %= 13;p++;
-					if(q >= 39) q %= 16;q++;
-					score++;
-					R++;
-				}
-				player = '^';
-				for(i=0; i<R; i++){
-					for(j=0; j<R; j++){
-						map[a[i]][b[j]] = tail[n];
-						n++;
-					}
-				}
-}
-void moveDown(){
-	if(map[y+1][x] == ' '){
-				y++;
-				map[y][x] = player;
-	}
-				else if(map[y + 1][x] == food){
-					p *= (rand + y * 6);q *= (rand + x * 8);
-					if(p >= 19) p %= 18;p++;
-					if(q >= 39) q %= 15;q++;
-					score++;
-					R++;
-				}
-				player = 'v';
-				for(i=0; i<R; i++){
-					for(j=0; j<R; j++){
-						map[a[i]][b[j]] = tail[n];
-						n++;
-					}
-				}
-}
-void moveLeft(){
-	if (map[y][x-1] == ' '){
-				x--;
-				map[y][x] = player;
-				}
-				else if(map[y][x-1] == food){
-					p *= (rand + y * 5);q *= (rand + x * 7);
-					if(p >= 19) p %= 18;p++;
-					if(q >= 39) q %= 17;q++;
-					score++;
-					R++;
-				}
-				player = '<';
-				for(i=0; i<R; i++){
-					for(j=0; j<R; j++){
-						map[a[i]][b[j]] = tail[n];
-						n++;
-					}
-				}
-}
-void moveRight(){
-	if(map[y][x+1] == ' '){
-				x++;
-				map[y][x] = player;
-				}
-				else if(map[y][x+1] == food){
-					p *= (rand + y * 2);q *= (rand + x * 3);
-					if(p >= 19) p %= 18;p++;
-					if(q >= 39) q %= 18;q++;
-					score++;
-					R++;
-				}
-				player = '>';
-				for(i=0; i<R; i++){
-						for(j=0; j<R; j++){
-							map[a[i]][b[j]] = tail[n];
-							n++;
-					}
-				}
+    return 0;
 }
